@@ -58,7 +58,17 @@ const thinkHand = (u = 1, tap = 0) => {
     `<ellipse class="lf2" cx="${mc[0].toFixed(2)}" cy="${mc[1].toFixed(2)}" rx="4.5" ry="3.2" transform="rotate(${(ma - 40).toFixed(1)} ${n2(mc)})"/>` +
     `<ellipse class="lf" cx="${ec[0].toFixed(2)}" cy="${ec[1].toFixed(2)}" rx="4.5" ry="3.2" transform="rotate(${ea.toFixed(1)} ${n2(ec)})"/>`;
 };
-const FRONT = { thinking: thinkHand() };
+// 😭: the peace lily (upright), famous for collapsing dramatically. k = 0 upright, 1 fully drooped:
+// the side leaves turn further out and down.
+const droop = k => SHAPES.upright.replace(/rotate\((-?)(42|20) 32 44\)/g,
+  (_, sign, a) => `rotate(${sign}${(+a + (a === '42' ? 22 : 12) * k).toFixed(1)} 32 44)`);
+SHAPES['upright-droop'] = droop(1);
+// Tear streams run from the eyes to the bottom of the pot (face coordinates); drops fall below it (sticker coordinates).
+const TEAR_STREAMS = ['M28 51.8c-.4 2.6.4 5 0 7.6', 'M36 51.8c.4 2.6-.4 5 0 7.6'];
+const TEAR_X = [26, 38];
+const tears = (flow = 0) => TEAR_STREAMS.map(d => `<path fill="none" stroke="#6bb5ff" stroke-width="1.9" stroke-linecap="round" d="${d}"/>` +
+  `<path fill="none" stroke="#d3e8ff" stroke-width=".7" stroke-linecap="round" stroke-dasharray="1 2.2" stroke-dashoffset="${flow}" d="${d}"/>`).join('');
+const FRONT = { thinking: thinkHand(), crying: drop(TEAR_X[0], 69, .7) + drop(TEAR_X[1], 71.5, .6) };
 const PROPS = {
   hot: `<circle fill="#ffc93c" cx="4" cy="6" r="4.2"/><path stroke="#ffc93c" stroke-width="1.6" stroke-linecap="round" d="M4-2.5v1.6M4 13v1.6M-4.5 6h1.6M11 6h1.6M-2 0l1.1 1.1M8.9 10.9 10 12M-2 12l1.1-1.1M8.9 1.1 10 0"/>${drop(15, 37, .8)}${drop(50, 35, .9)}`,
   watered: `${drop(9, 13)}${drop(16, 5, .8)}${drop(4, 23, .7)}`,
@@ -83,6 +93,9 @@ const NEW_FACES = {
   party: '<path class="fs" d="M26.2 51l1.8-1.9 1.8 1.9M34.2 51l1.8-1.9 1.8 1.9"/><path class="fe" d="M28.8 52.8h6.4q-.3 3.4-3.2 3.4t-3.2-3.4z"/><path fill="#ff6f9f" d="M30.6 55.4q1.4-1.2 2.8 0-.5.8-1.4.8t-1.4-.8z"/>',
   grumpy: '<path class="fs" d="M25.8 47.4l3.4 1.5M38.2 47.4l-3.4 1.5M29.4 55.4q2.6-1.8 5.2 0"/><circle class="fe" cx="28" cy="50.8" r="1.5"/><circle class="fe" cx="36" cy="50.8" r="1.5"/>',
   wink: '<circle class="fe" cx="28" cy="50.2" r="1.5"/><path class="fs" d="M34.2 50.6q1.8-1.8 3.6 0M29 53.2q3 2.8 6 0"/>',
+  // eyes squeezed shut, worried brows (inner ends up), wide wailing mouth with a tongue, tear streams
+  crying: '<path class="fs" d="M25.8 47.9l3.2-1.1M38.2 47.9l-3.2-1.1M26.2 51q1.8-1.8 3.6 0M34.2 51q1.8-1.8 3.6 0"/>' +
+    '<path class="fe" d="M28 57.4q4-5.6 8 0z"/><path fill="#ff6f9f" d="M30.2 57.4q1.8-1.6 3.6 0z"/>' + tears(),
   // eyes with a shine glance up at the thought bubble, one brow raised, lips pursed to one side (no low brows: they read angry)
   thinking: '<circle class="fe" cx="29" cy="50.2" r="1.6"/><circle class="fe" cx="37" cy="50.2" r="1.6"/><circle fill="#fff" cx="29.6" cy="49.5" r=".55"/><circle fill="#fff" cx="37.6" cy="49.5" r=".55"/><path class="fs" d="M34.8 47.8q1.8-1.2 3.6 0M30.8 54.2q-1.1.9 0 1.8"/>',
 };
@@ -113,6 +126,7 @@ const SET = [
   ['11-grumpy', 'prayer', 'grumpy', 4, '😤', 'grumpy'],
   ['12-wink', 'coleus', 'wink', 5, '😉', 'wink'],
   ['13-thinking', 'trailing-arm', 'thinking', 3, '🤔', 'thinking'],
+  ['14-crying', 'upright-droop', 'crying', 0, '😭', 'crying'],
 ];
 
 // Thin white sticker outline with a soft shadow. Blur + threshold gives a round edge
@@ -131,7 +145,7 @@ const svgDoc = (pot, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="51
 const shot = (svgPath, pngPath) => execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars',
   '--default-background-color=00000000', '--window-size=512,512', `--screenshot=${pngPath}`, `file://${svgPath}`], { stdio: 'ignore' });
 
-module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
+module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, droop, tears, TEAR_X, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
 if (require.main === module) main();
 
 function main() {

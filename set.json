@@ -89,5 +89,12 @@
     "mood": "thinking",
     "emoji": "🤔",
     "meaning": "thinking"
+  },
+  {
+    "file": "png/14-crying.png",
+    "shape": "upright-droop",
+    "mood": "crying",
+    "emoji": "😭",
+    "meaning": "crying"
   }
 ]

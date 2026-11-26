@@ -9,7 +9,7 @@ const os = require('os');
 const path = require('path');
 const { execFile, execFileSync } = require('child_process');
 const { promisify } = require('util');
-const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
+const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, droop, tears, TEAR_X, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
 
 // Telegram allows up to 3 s, 30 fps and 256 KB. Whole-sticker moves are translations, not rotations:
 // a rotated frame changes every pixel and the size limit then forces heavy compression.
@@ -43,12 +43,12 @@ const blink = (face, t, at) => eyes(face, 1 - .92 * bump(t, at, .045));
 const float = (svg, a, transform = '') => a < .002 ? '' :
   `<g opacity="${f(Math.min(1, a))}"><g filter="url(#o)"${transform ? ` transform="${transform}"` : ''}>${svg}</g></g>`;
 
-// One frame: plant (sway, sag) on a pot (squash from its base), with props behind/in front.
+// One frame: plant (a SHAPES name or raw SVG; sway, sag) on a pot (squash from its base), with props behind/in front.
 // back: drawn inside the main outline, behind the plant; fore: inside the main outline, in front of the pot; front: own outlines, moves with the sticker; over: own outlines, stays put.
 function scene({ shape, face, rot = 0, sag = 1, potSx = 1, potSy = 1, whole = '', back = '', fore = '', front = '', over = '' }) {
   const lift = -(potSy - 1) * POT_HEIGHT; // the rim moves with the squash, the plant rides on it
   const plant = `<g transform="translate(0 ${f(lift)}) rotate(${f(rot)} 32 44) translate(32 44) scale(1 ${f(sag)}) translate(-32 -44)">` +
-    `${SHAPES[shape].replace(POT_SVG, '')}</g>`;
+    `${(shape.startsWith('<') ? shape : SHAPES[shape]).replace(POT_SVG, '')}</g>`;
   const pot = `<g transform="translate(32 ${POT_BOTTOM}) scale(${f(potSx)} ${f(potSy)}) translate(-32 ${-POT_BOTTOM})">${potWith(face)}</g>`;
   return `<g${whole ? ` transform="${whole}"` : ''}><g filter="url(#o)">${back}${plant}${pot}${fore}</g>${front}</g>${over}`;
 }
@@ -197,6 +197,20 @@ const ANIMATIONS = {
     const bubble = grow(THOUGHT.c1, pop(.4), AT.c1) + grow(THOUGHT.c2, pop(.46), AT.c2) +
       grow(THOUGHT.bubble + THOUGHT.q, pop(.52), AT.bubble, `rotate(${f(5 * sin(2 * t))})`);
     return scene({ shape: 'trailing-arm', face, rot: 1.5 * sin(t), fore: thinkHand(lift, f(tap)), over: bubble });
+  } },
+  // Peace lily drama: three sobs (pot heaves, leaves lift and flop, the wail widens), tears stream and drip
+  '14-crying': { pot: 0, frame(t) {
+    const sob = (1 - cos(3 * t)) / 2;
+    const face = CHEEKS + '<path class="fs" d="M25.8 47.9l3.2-1.1M38.2 47.9l-3.2-1.1M26.2 51q1.8-1.8 3.6 0M34.2 51q1.8-1.8 3.6 0"/>' +
+      `<g transform="translate(32 57.4) scale(${f(1 - .06 * sob)} ${f(1 + .35 * sob)}) translate(-32 -57.4)">` +
+      '<path class="fe" d="M28 57.4q4-5.6 8 0z"/><path fill="#ff6f9f" d="M30.2 57.4q1.8-1.6 3.6 0z"/></g>' +
+      tears(f(-3.2 * 4 * t)); // 4 dash periods per loop, flowing down
+    const drips = TEAR_X.flatMap((x, i) => [0, .5].map(ph => {
+      const p = (2 * t + ph + i * .25) % 1;
+      return float(drop(x, f(67 + 8 * p), .65), fade(p, .12, .35));
+    })).join('');
+    return scene({ shape: droop(1 - .3 * sob), face, potSx: 1 - .02 * sob, potSy: 1 + .035 * sob,
+      whole: `translate(0 ${f(-1.2 * sob)})`, front: drips });
   } },
 };
 
