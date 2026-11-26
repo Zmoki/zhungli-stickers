@@ -1,6 +1,8 @@
 # Жунгли stickers
 
-Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.xyz/) app. Test set, not published in Telegram yet.
+Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.xyz/) app.
+
+**Add the pack:** [t.me/addstickers/wearejungly](https://t.me/addstickers/wearejungly)
 
 ![12 stickers on light and dark chat backgrounds](preview.png)
 
@@ -31,4 +33,4 @@ In @Stickers, upload `png/` with `/newpack` and `webm/` with `/newvideo`.
 
 ## License
 
-All rights reserved. You can send the stickers from the official pack in Telegram. See [LICENSE](LICENSE).
+All rights reserved. You can send the stickers from the [official pack](https://t.me/addstickers/wearejungly) in Telegram. See [LICENSE](LICENSE).
