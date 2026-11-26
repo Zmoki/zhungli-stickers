@@ -182,13 +182,17 @@ const ANIMATIONS = {
     const grow = (svg, k, [cx, cy], extra = '') => k > .01 ? float(svg, 1, `translate(${cx} ${cy}) scale(${f(k)}) ${extra} translate(${-cx} ${-cy})`) : '';
     const lift = Math.max(0, smooth((t - .08) / .2) - smooth((t - .74) / .18)); // 0 hanging, 1 at the chin
     const tap = -12 * (bump(t, .38, .04) + bump(t, .48, .04));
+    // mouth: a soft smile while the vine hangs, turning into pursed lips as the vine reaches the chin, and back
+    const m = Math.max(0, smooth((t - .14) / .14) - smooth((t - .74) / .14));
+    const SMILE = [29.6, 54.4, 2.4, 1.6, 4.8, 0], PURSED = [30.8, 54.2, -1.1, .9, 0, 1.8]; // M x y q cx cy ex ey
+    const mix = (a, b, k) => { const v = a.map((x, i) => f(x + (b[i] - x) * k)); return `${v[0]} ${v[1]}q${v[2]} ${v[3]} ${v[4]} ${v[5]}`; };
     // eyes: up-left while lifting, then up-right at the bubble, back at the end
     const side = -1 + 2 * (smooth((t - .34) / .08) - smooth((t - .78) / .1));
     const ex = 28.2 + .9 * side, ey = 50.5, r = .35 * (side + 1);
     const eye = x => `<circle class="fe" cx="${f(x)}" cy="${f(ey)}" r="1.6"/><circle fill="#fff" cx="${f(x + .6)}" cy="${f(ey - .7)}" r=".55"/>`;
     const face = CHEEKS + blink(eye(ex) + eye(ex + 8), t, .62) +
       `<path class="fs" d="M34.8 ${f(47.9 - .3 * r)}q1.8 ${f(-1.1 - r)} 3.6 0"/>` +
-      `<path class="fs" transform="translate(${f(.35 * sin(2 * t))} 0)" d="M30.8 54.2q-1.1.9 0 1.8"/>`;
+      `<path class="fs" transform="translate(${f(.35 * m * sin(2 * t))} 0)" d="M${mix(SMILE, PURSED, m)}"/>`;
     const { AT } = THOUGHT;
     const bubble = grow(THOUGHT.c1, pop(.4), AT.c1) + grow(THOUGHT.c2, pop(.46), AT.c2) +
       grow(THOUGHT.bubble + THOUGHT.q, pop(.52), AT.bubble, `rotate(${f(5 * sin(2 * t))})`);
