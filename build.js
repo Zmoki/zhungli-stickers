@@ -82,9 +82,13 @@ const SET = [
   ['12-wink', 'coleus', 'wink', 5, '😉', 'wink'],
 ];
 
-// White sticker outline with a soft shadow, drawn around everything in the group
+// White sticker outline with a soft shadow. Two blur + threshold masks, joined:
+// a thin round edge around every detail, and a smooth blob that fills the gaps between leaves.
+const EDGE = [1.3, .06, 30], BLOB = [5, .14, 120]; // [blur, cut, sharpness]: more blur = smoother, lower cut = wider
+const mask = ([blur, cut, k], out) => `<feGaussianBlur in="SourceAlpha" stdDeviation="${blur}"/>
+  <feComponentTransfer result="${out}"><feFuncA type="linear" slope="${k}" intercept="${-k * cut}"/></feComponentTransfer>`;
 const FILTER = `<filter id="o" x="-30%" y="-30%" width="160%" height="160%">
-  <feMorphology in="SourceAlpha" operator="dilate" radius="1.9" result="d"/>
+  ${mask(EDGE, 'e')}${mask(BLOB, 'b')}<feComposite in="e" in2="b" operator="over" result="d"/>
   <feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/>
   <feGaussianBlur in="d" stdDeviation="1.1"/><feOffset dy=".9"/><feComponentTransfer><feFuncA type="linear" slope=".28"/></feComponentTransfer>
   <feMerge><feMergeNode/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
