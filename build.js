@@ -62,8 +62,8 @@ const NEW_FACES = {
   party: '<path class="fs" d="M26.2 51l1.8-1.9 1.8 1.9M34.2 51l1.8-1.9 1.8 1.9"/><path class="fe" d="M28.8 52.8h6.4q-.3 3.4-3.2 3.4t-3.2-3.4z"/><path fill="#ff6f9f" d="M30.6 55.4q1.4-1.2 2.8 0-.5.8-1.4.8t-1.4-.8z"/>',
   grumpy: '<path class="fs" d="M25.8 47.4l3.4 1.5M38.2 47.4l-3.4 1.5M29.4 55.4q2.6-1.8 5.2 0"/><circle class="fe" cx="28" cy="50.8" r="1.5"/><circle class="fe" cx="36" cy="50.8" r="1.5"/>',
   wink: '<circle class="fe" cx="28" cy="50.2" r="1.5"/><path class="fs" d="M34.2 50.6q1.8-1.8 3.6 0M29 53.2q3 2.8 6 0"/>',
-  // eyes glance up at the thought bubble, right brow raised, "hmm" mouth
-  thinking: '<circle class="fe" cx="28.6" cy="51" r="1.5"/><circle class="fe" cx="36.6" cy="51" r="1.5"/><path class="fs" d="M26.6 48.6l3 .1M34.4 48.2q1.8-1.4 3.6-.2M30 55.4l4.2-.7"/>',
+  // eyes with a shine glance up at the thought bubble, one brow raised, wavy "hmm" mouth (no low brows: they read angry)
+  thinking: '<circle class="fe" cx="29" cy="50.2" r="1.6"/><circle class="fe" cx="37" cy="50.2" r="1.6"/><circle fill="#fff" cx="29.6" cy="49.5" r=".55"/><circle fill="#fff" cx="37.6" cy="49.5" r=".55"/><path class="fs" d="M34.8 47.8q1.8-1.2 3.6 0M30.2 55q1-.9 2 0t2 0"/>',
 };
 // Props drawn inside the face, so they scale with it
 const FACE_PROPS = { laugh: `${drop(22.6, 49.6, .5)}${drop(41.4, 49.6, .5)}` };

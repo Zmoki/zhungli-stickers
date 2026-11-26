@@ -181,10 +181,11 @@ const ANIMATIONS = {
     const pop = at => (t < at ? 0 : backOut(Math.min(1, (t - at) / .1))) * out;
     const grow = (svg, k, cx, cy, extra = '') => k > .01 ? float(svg, 1, `translate(${cx} ${cy}) scale(${f(k)}) ${extra} translate(${-cx} ${-cy})`) : '';
     const look = smooth((t - .16) / .1) * (1 - smooth((t - .84) / .1)); // 0 = ahead, 1 = up at the bubble
-    const ex = 27.6 + 1 * look, ey = 51.4 - .5 * look, r = .7 * look;
-    const face = CHEEKS + blink(`<circle class="fe" cx="${f(ex)}" cy="${f(ey)}" r="1.5"/><circle class="fe" cx="${f(ex + 8)}" cy="${f(ey)}" r="1.5"/>`, t, .55) +
-      `<path class="fs" d="M26.6 48.6l3 .1M34.4 ${f(48.4 - .2 * look)}q1.8 ${f(-1 - r)} 3.6 -.2"/>` +
-      `<path class="fs" transform="translate(${f(.5 * sin(3 * t))} 0)" d="M30 55.4l4.2-.7"/>`;
+    const ex = 27.8 + 1.2 * look, ey = 51 - .8 * look;
+    const eye = x => `<circle class="fe" cx="${f(x)}" cy="${f(ey)}" r="1.6"/><circle fill="#fff" cx="${f(x + .6)}" cy="${f(ey - .7)}" r=".55"/>`;
+    const face = CHEEKS + blink(eye(ex) + eye(ex + 8), t, .55) +
+      `<path class="fs" d="M34.8 ${f(48.4 - .6 * look)}q1.8 ${f(-.8 - .4 * look)} 3.6 0"/>` +
+      `<path class="fs" transform="translate(${f(.5 * sin(3 * t))} 0)" d="M30.2 55q1-.9 2 0t2 0"/>`;
     const bubble = grow(THOUGHT.c1, pop(.06), 57.6, 13.6) + grow(THOUGHT.c2, pop(.14), 60, 9.4) +
       grow(THOUGHT.bubble + THOUGHT.q, pop(.22), 64, 1, `rotate(${f(5 * sin(2 * t))})`);
     return scene({ shape: 'upright', face, rot: 1.5 * sin(t), over: bubble });

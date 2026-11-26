@@ -27,7 +27,7 @@ Agree with the user on:
 
 ## 2. Static sticker (build.js)
 
-- New face: add to `NEW_FACES` on the face grid: eyes at x 28 and 36, y ≈ 50; mouth y ≈ 54; brows no higher than y 47.4 (the rim starts above). Class `fe` is filled ink, `fs` is an ink stroke.
+- New face: add to `NEW_FACES` on the face grid: eyes at x 28 and 36, y ≈ 50; mouth y ≈ 54; brows no higher than y 47.4 (the rim starts above). Class `fe` is filled ink, `fs` is an ink stroke. Low or flat brows close to the eyes read angry; for friendly faces leave brows out or raise them, and add a white shine to round eyes (`<circle fill="#fff" … r=".55"/>`). Look at the face at full size before moving on.
 - New prop: add to `PROPS` under the mood name. Keep it inside x −4…68, y −8…68 and off the pot (the pot is wider than in the app: x 11–53 at the rim).
 - Add a row to `SET`: next number, file `NN-name`, shape, mood, pot, emoji, meaning.
 - Run `node build.js` and look at `preview.png` (light and dark chat backgrounds).
