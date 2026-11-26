@@ -32,7 +32,7 @@ const heart = (x, y, s = 1, c = '#e2457e') => `<path fill="${c}" transform="tran
 const spark = (x, y, s = 1, c = '#ffc93c') => `<path fill="${c}" transform="translate(${x} ${y}) scale(${s})" d="M0-3.2Q.5-.5 3.2 0 .5.5 0 3.2-.5.5-3.2 0-.5-.5 0-3.2z"/>`;
 const zed = (x, y, s) => `<path class="ink" d="M${x} ${y}h${s}l-${s} ${s}h${s}"/>`;
 // Thought bubble: two small circles, a bubble and a "?" (animate.js pops them in one by one around AT)
-const AT = { c1: [57.6, 13.6], c2: [60, 9.4], bubble: [64, 1] };
+const AT = { c1: [50, 19.5], c2: [53.6, 14.2], bubble: [59.5, 6] };
 const THOUGHT = {
   AT,
   c1: `<circle fill="#e3ddff" cx="${AT.c1[0]}" cy="${AT.c1[1]}" r="1.2"/>`,
@@ -40,18 +40,24 @@ const THOUGHT = {
   bubble: `<ellipse fill="#e3ddff" cx="${AT.bubble[0]}" cy="${AT.bubble[1]}" rx="7.5" ry="6"/>`,
   q: `<g transform="translate(${AT.bubble[0] - 61} ${AT.bubble[1] - 3})"><path fill="none" stroke="#6b5bd6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M58.6 1.4q0-2.6 2.5-2.6t2.5 2.3q0 1.6-2.3 2.5v1.2"/><circle fill="#6b5bd6" cx="61.3" cy="7.2" r=".95"/></g>`,
 };
-// Chlorophytum (sticker-only shape): long arching leaves, green with a light stripe
-const SPIDER_LEAVES = ['M32 43C27 33 15 28 7 36', 'M32 43C37 33 49 28 57 36', 'M32 43C30 26 20 18 12 24', 'M32 43C34 26 44 18 52 24',
-  'M32 43C31 30 30 20 26 11', 'M32 43C33 30 35 20 39 11', 'M32 43C26 39 14 38 8 46', 'M32 43C38 39 50 38 56 46'];
-SHAPES.spider = SPIDER_LEAVES.map(d => `<path fill="none" stroke="#33b067" stroke-width="3.6" stroke-linecap="round" d="${d}"/>` +
-  `<path fill="none" stroke="#8ee3ae" stroke-width="1.05" stroke-linecap="round" d="${d}"/>`).join('');
-// 🤔 hand: a chlorophytum runner drapes over the rim in front of the pot and ends in a baby plantlet
-// at the chin, like a hand. Drawn in front of the pot, in sticker coordinates. tap tilts the plantlet (degrees).
-// Keep it in front of the pot: an arm that leaves the pot's outline and comes back reads as a mug handle.
-const HAND = [39.6, 62.4];
-const thinkHand = (tap = 0) => `<path fill="none" stroke="#1f8a4c" stroke-width="1.6" stroke-linecap="round" d="M36 41C42 39 45.5 44 45 51S42 60 ${HAND.join(' ')}"/>` +
-  `<path transform="rotate(${tap} ${HAND.join(' ')})" fill="none" stroke="#33b067" stroke-width="1.9" stroke-linecap="round" ` +
-  `d="${['l-3.6-3.4', 'l-1-4.6', 'l1.8-4', 'l-4.4-.8'].map(l => `M${HAND.join(' ')}${l}`).join('')}"/>`;
+// 🤔: the app's pothos (trailing) with its right vine as an arm. The vine is drawn in front of the pot
+// so it can reach the chin; u = 0 hangs down beside the pot like in the app, u = 1 holds the chin.
+// tap tilts the end leaf (degrees).
+SHAPES['trailing-arm'] = SHAPES.trailing.replace('M40 42c6 2 9 6 10 13', '').replace(/<ellipse class="lf2?" cx="5[01]"[^>]*\/>/g, '');
+const ARM_REST = [[48, 43], [54, 44], [57, 51], [56.5, 57.5]], ARM_UP = [[48, 43], [57, 44.5], [56, 67], [43.5, 64.2]];
+const bez = (p, t) => [0, 1].map(i => (1 - t) ** 3 * p[0][i] + 3 * (1 - t) ** 2 * t * p[1][i] + 3 * (1 - t) * t ** 2 * p[2][i] + t ** 3 * p[3][i]);
+const bezTan = (p, t) => [0, 1].map(i => 3 * (1 - t) ** 2 * (p[1][i] - p[0][i]) + 6 * (1 - t) * t * (p[2][i] - p[1][i]) + 3 * t ** 2 * (p[3][i] - p[2][i]));
+const deg = v => Math.atan2(v[1], v[0]) * 180 / Math.PI;
+const n2 = v => v.map(x => x.toFixed(2)).join(' ');
+const thinkHand = (u = 1, tap = 0) => {
+  const p = ARM_REST.map((a, i) => a.map((v, j) => v + (ARM_UP[i][j] - v) * u));
+  const m = bez(p, .45), ma = deg(bezTan(p, .45)), e = p[3], ea = deg(bezTan(p, 1)) + +tap;
+  const mr = (ma - 90) * Math.PI / 180, mc = [m[0] + 2.6 * Math.cos(mr), m[1] + 2.6 * Math.sin(mr)];
+  const er = ea * Math.PI / 180, ec = [e[0] + 3.4 * Math.cos(er), e[1] + 3.4 * Math.sin(er)];
+  return `<path class="st" d="M${n2(p[0])}C${n2(p[1])} ${n2(p[2])} ${n2(p[3])}"/>` +
+    `<ellipse class="lf2" cx="${mc[0].toFixed(2)}" cy="${mc[1].toFixed(2)}" rx="4.5" ry="3.2" transform="rotate(${(ma - 40).toFixed(1)} ${n2(mc)})"/>` +
+    `<ellipse class="lf" cx="${ec[0].toFixed(2)}" cy="${ec[1].toFixed(2)}" rx="4.5" ry="3.2" transform="rotate(${ea.toFixed(1)} ${n2(ec)})"/>`;
+};
 const FRONT = { thinking: thinkHand() };
 const PROPS = {
   hot: `<circle fill="#ffc93c" cx="4" cy="6" r="4.2"/><path stroke="#ffc93c" stroke-width="1.6" stroke-linecap="round" d="M4-2.5v1.6M4 13v1.6M-4.5 6h1.6M11 6h1.6M-2 0l1.1 1.1M8.9 10.9 10 12M-2 12l1.1-1.1M8.9 1.1 10 0"/>${drop(15, 37, .8)}${drop(50, 35, .9)}`,
@@ -106,7 +112,7 @@ const SET = [
   ['10-party', 'flowering', 'party', 0, '🥳', 'party'],
   ['11-grumpy', 'prayer', 'grumpy', 4, '😤', 'grumpy'],
   ['12-wink', 'coleus', 'wink', 5, '😉', 'wink'],
-  ['13-thinking', 'spider', 'thinking', 3, '🤔', 'thinking'],
+  ['13-thinking', 'trailing-arm', 'thinking', 3, '🤔', 'thinking'],
 ];
 
 // Thin white sticker outline with a soft shadow. Blur + threshold gives a round edge
