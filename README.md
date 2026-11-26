@@ -4,7 +4,7 @@ Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.
 
 ![12 stickers on light and dark chat backgrounds](preview.png)
 
-![Animated sleepy sticker](animated-preview.gif)
+![12 animated stickers](animated-preview.gif)
 
 ## Files
 
@@ -12,7 +12,7 @@ Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.
 - `svg/`: the same stickers as vector files
 - `set.json`: the emoji and meaning for each sticker
 - `build.js`: builds everything above and `preview.png`
-- `webm/`: animated video stickers, 512×512, 24 fps, 2.9 s loop
+- `webm/`: animated video stickers, 512×512, 24 fps, 2.9 s loop, same names and emoji as `png/`
 - `animate.js`: builds `webm/` and `animated-preview.gif`
 
 ## Build

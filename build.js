@@ -99,7 +99,7 @@ const svgDoc = (pot, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="51
 const shot = (svgPath, pngPath) => execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars',
   '--default-background-color=00000000', '--window-size=512,512', `--screenshot=${pngPath}`, `file://${svgPath}`], { stdio: 'ignore' });
 
-module.exports = { SHAPES, POT_SVG, CHEEKS, CHROME, SET, POT_SCALE, zed, potWith, svgDoc, shot };
+module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
 if (require.main === module) main();
 
 function main() {
