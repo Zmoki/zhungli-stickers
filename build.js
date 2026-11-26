@@ -40,12 +40,18 @@ const THOUGHT = {
   bubble: `<ellipse fill="#e3ddff" cx="${AT.bubble[0]}" cy="${AT.bubble[1]}" rx="7.5" ry="6"/>`,
   q: `<g transform="translate(${AT.bubble[0] - 61} ${AT.bubble[1] - 3})"><path fill="none" stroke="#6b5bd6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M58.6 1.4q0-2.6 2.5-2.6t2.5 2.3q0 1.6-2.3 2.5v1.2"/><circle fill="#6b5bd6" cx="61.3" cy="7.2" r=".95"/></g>`,
 };
-// 🤔 hand: an arm from the pot's side (shoulder, elbow) with a leaf hand up at the chin.
-// Drawn in front of the pot, in sticker coordinates. tap tilts the hand (degrees).
-// An arm joined to the rim and hugging the pot reads as a mug handle; this one starts on the side.
-const HAND_BASE = '41 64.2';
-const thinkHand = (tap = 0) => '<path fill="none" stroke="#1f8a4c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M47.4 54.4Q55.6 57.6 53.8 63.4Q49 67.6 40.4 63.8"/>' +
-  `<g transform="rotate(${tap} ${HAND_BASE}) translate(${HAND_BASE}) scale(1.25) translate(${HAND_BASE.split(' ').map(n => -n).join(' ')})"><path class="lf" d="M41 64.2c-3.6-.2-5.8-2.8-5.4-6.6 3.4.6 5.6 3.2 5.4 6.6z"/></g>`;
+// Chlorophytum (sticker-only shape): long arching leaves, green with a light stripe
+const SPIDER_LEAVES = ['M32 43C27 33 15 28 7 36', 'M32 43C37 33 49 28 57 36', 'M32 43C30 26 20 18 12 24', 'M32 43C34 26 44 18 52 24',
+  'M32 43C31 30 30 20 26 11', 'M32 43C33 30 35 20 39 11', 'M32 43C26 39 14 38 8 46', 'M32 43C38 39 50 38 56 46'];
+SHAPES.spider = SPIDER_LEAVES.map(d => `<path fill="none" stroke="#33b067" stroke-width="3.6" stroke-linecap="round" d="${d}"/>` +
+  `<path fill="none" stroke="#8ee3ae" stroke-width="1.05" stroke-linecap="round" d="${d}"/>`).join('');
+// 🤔 hand: a chlorophytum runner drapes over the rim in front of the pot and ends in a baby plantlet
+// at the chin, like a hand. Drawn in front of the pot, in sticker coordinates. tap tilts the plantlet (degrees).
+// Keep it in front of the pot: an arm that leaves the pot's outline and comes back reads as a mug handle.
+const HAND = [39.6, 62.4];
+const thinkHand = (tap = 0) => `<path fill="none" stroke="#1f8a4c" stroke-width="1.6" stroke-linecap="round" d="M36 41C42 39 45.5 44 45 51S42 60 ${HAND.join(' ')}"/>` +
+  `<path transform="rotate(${tap} ${HAND.join(' ')})" fill="none" stroke="#33b067" stroke-width="1.9" stroke-linecap="round" ` +
+  `d="${['l-3.6-3.4', 'l-1-4.6', 'l1.8-4', 'l-4.4-.8'].map(l => `M${HAND.join(' ')}${l}`).join('')}"/>`;
 const FRONT = { thinking: thinkHand() };
 const PROPS = {
   hot: `<circle fill="#ffc93c" cx="4" cy="6" r="4.2"/><path stroke="#ffc93c" stroke-width="1.6" stroke-linecap="round" d="M4-2.5v1.6M4 13v1.6M-4.5 6h1.6M11 6h1.6M-2 0l1.1 1.1M8.9 10.9 10 12M-2 12l1.1-1.1M8.9 1.1 10 0"/>${drop(15, 37, .8)}${drop(50, 35, .9)}`,
@@ -100,7 +106,7 @@ const SET = [
   ['10-party', 'flowering', 'party', 0, '🥳', 'party'],
   ['11-grumpy', 'prayer', 'grumpy', 4, '😤', 'grumpy'],
   ['12-wink', 'coleus', 'wink', 5, '😉', 'wink'],
-  ['13-thinking', 'upright', 'thinking', 3, '🤔', 'thinking'],
+  ['13-thinking', 'spider', 'thinking', 3, '🤔', 'thinking'],
 ];
 
 // Thin white sticker outline with a soft shadow. Blur + threshold gives a round edge

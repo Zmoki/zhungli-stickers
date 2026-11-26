@@ -28,7 +28,7 @@ Agree with the user on:
 ## 2. Static sticker (build.js)
 
 - New face: add to `NEW_FACES` on the face grid: eyes at x 28 and 36, y ≈ 50; mouth y ≈ 54; brows no higher than y 47.4 (the rim starts above). Class `fe` is filled ink, `fs` is an ink stroke. Low or flat brows close to the eyes read angry; for friendly faces leave brows out or raise them, and add a white shine to round eyes (`<circle fill="#fff" … r=".55"/>`). Look at the face at full size before moving on.
-- Gestures (like the 🤔 hand on chin): add to `FRONT` (drawn in front of the pot) and pass the same drawing as `fore` in `scene()`. An arm joined to the rim and hugging the pot reads as a mug handle; start it on the pot's side, bend it at an elbow, end in a leaf hand (see `thinkHand`).
+- Gestures (like the 🤔 hand on chin): add to `FRONT` (drawn in front of the pot) and pass the same drawing as `fore` in `scene()`. Make the gesture from the plant itself, so it looks natural: a chlorophytum runner with a baby plantlet as the hand (see `thinkHand`), a vine, a leaf. Keep it in front of the pot: a stem that leaves the pot's outline and comes back reads as a mug handle. Sticker-only plants can be added to `SHAPES` in build.js (see `SHAPES.spider`).
 - New prop: add to `PROPS` under the mood name. Keep it inside x −4…68, y −8…68 and off the pot (the pot is wider than in the app: x 11–53 at the rim).
 - Add a row to `SET`: next number, file `NN-name`, shape, mood, pot, emoji, meaning.
 - Run `node build.js` and look at `preview.png` (light and dark chat backgrounds).

@@ -187,11 +187,11 @@ const ANIMATIONS = {
     const face = CHEEKS + blink(eye(ex) + eye(ex + 8), t, .62) +
       `<path class="fs" d="M34.8 ${f(47.9 - .3 * r)}q1.8 ${f(-1.1 - r)} 3.6 0"/>` +
       `<path class="fs" transform="translate(${f(.4 * sin(2 * t))} 0)" d="M29.4 55q1-.9 2 0t2 0"/>`;
-    const tap = -10 * (bump(t, .12, .05) + bump(t, .22, .05));
+    const tap = -12 * (bump(t, .12, .05) + bump(t, .22, .05));
     const { AT } = THOUGHT;
     const bubble = grow(THOUGHT.c1, pop(.36), AT.c1) + grow(THOUGHT.c2, pop(.42), AT.c2) +
       grow(THOUGHT.bubble + THOUGHT.q, pop(.48), AT.bubble, `rotate(${f(5 * sin(2 * t))})`);
-    return scene({ shape: 'upright', face, rot: 1.5 * sin(t), fore: thinkHand(f(tap)), over: bubble });
+    return scene({ shape: 'spider', face, rot: 1.5 * sin(t), fore: thinkHand(f(tap)), over: bubble });
   } },
 };
 
