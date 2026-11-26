@@ -1,5 +1,5 @@
 /*! Жунгли stickers · Copyright (c) 2026 Zarema Khalilova. All rights reserved. See LICENSE. */
-// Builds animated Telegram video stickers: webm/*.webm (512x512 VP9 with alpha, under 3 s, 30 fps, looping).
+// Builds animated Telegram video stickers: webm/*.webm (512x512 VP9 with alpha, under 3 s, 24 fps, looping).
 // Each frame is an SVG drawn from the same parts as build.js, rendered by headless Chrome, then joined by ffmpeg.
 const fs = require('fs');
 const os = require('os');
@@ -8,7 +8,9 @@ const { execFile, execFileSync } = require('child_process');
 const { promisify } = require('util');
 const { SHAPES, POT_SVG, CHEEKS, POT_SCALE, CHROME, zed, potWith, svgDoc } = require('./build.js');
 
-const FPS = 30, FRAMES = 87; // 2.9 s: Telegram allows up to 3 s
+// Telegram allows up to 3 s, 30 fps and 256 KB. 24 fps leaves room for higher quality:
+// at 30 fps the size limit forces CRF 34, which smudges the pot on some frames.
+const FPS = 24, FRAMES = 70, CRF = 28; // 2.92 s
 const TAU = Math.PI * 2;
 const POT_BOTTOM = 40.5 + 19.8 * POT_SCALE; // the pot squashes from its base
 const POT_HEIGHT = 19.8 * POT_SCALE;
@@ -60,8 +62,8 @@ async function render(name, { pot, frame }) {
   fs.mkdirSync(path.join(__dirname, 'webm'), { recursive: true });
   const out = path.join(__dirname, 'webm', `${name}.webm`);
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(dir, '%03d.png'),
-    '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-b:v', '0', '-crf', '34', '-deadline', 'good', '-an', out]);
-  fs.rmSync(dir, { recursive: true });
+    '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-b:v', '0', '-crf', String(CRF), '-deadline', 'good', '-an', out]);
+  if (process.env.KEEP_FRAMES) console.log('frames kept in', dir); else fs.rmSync(dir, { recursive: true });
   console.log(name, `${(fs.statSync(out).size / 1024).toFixed(0)} KB`);
 }
 
