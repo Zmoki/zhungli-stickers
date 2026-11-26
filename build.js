@@ -63,8 +63,9 @@ const POT_SCALE = 1.3, FACE_SCALE = 1.15;
 // Telegram stretches the 512 px canvas to its sticker size, so empty margin makes stickers look smaller.
 // 80 units fit the drawing edge to edge; 94 shows it at about 85%.
 const SIZE = 94, VIEW = `${32 - SIZE / 2} ${31 - SIZE / 2} ${SIZE} ${SIZE}`;
-const potWithFace = m => `<g transform="translate(32 40.5) scale(${POT_SCALE}) translate(-32 -40.5)">${POT_SVG}` +
-  `<g transform="translate(32 52) scale(${FACE_SCALE}) translate(-32 -52)">${face(m)}</g></g>`;
+const potWith = faceSvg => `<g transform="translate(32 40.5) scale(${POT_SCALE}) translate(-32 -40.5)">${POT_SVG}` +
+  `<g transform="translate(32 52) scale(${FACE_SCALE}) translate(-32 -52)">${faceSvg}</g></g>`;
+const potWithFace = m => potWith(face(m));
 
 // [file, shape, mood, pot color, emoji, meaning]
 const SET = [
@@ -92,19 +93,24 @@ const FILTER = `<filter id="o" x="-30%" y="-30%" width="160%" height="160%">
   <feGaussianBlur in="d" stdDeviation=".9"/><feOffset dy=".7"/><feComponentTransfer><feFuncA type="linear" slope=".25"/></feComponentTransfer>
   <feMerge><feMergeNode/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
 
+const svgDoc = (pot, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="${VIEW}">
+<style>:root{--pot:${POTS[pot][0]};--pot-2:${POTS[pot][1]}}html,body,svg{margin:0;background:transparent}${CSS}</style>
+<defs>${FILTER}</defs>${body}</svg>`;
+const shot = (svgPath, pngPath) => execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars',
+  '--default-background-color=00000000', '--window-size=512,512', `--screenshot=${pngPath}`, `file://${svgPath}`], { stdio: 'ignore' });
+
+module.exports = { SHAPES, POT_SVG, CHEEKS, CHROME, SET, POT_SCALE, zed, potWith, svgDoc, shot };
+if (require.main === module) main();
+
+function main() {
 fs.mkdirSync(path.join(__dirname, 'svg'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'png'), { recursive: true });
 for (const [file, shape, mood, pot, emoji] of SET) {
-  const [p1, p2] = POTS[pot];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="${VIEW}">
-<style>:root{--pot:${p1};--pot-2:${p2}}html,body,svg{margin:0;background:transparent}${CSS}</style>
-<defs>${FILTER}</defs>
-<g filter="url(#o)">${PROPS[mood] || ''}${SHAPES[shape].replace(POT_SVG, '')}${potWithFace(mood)}</g></svg>`;
+  const svg = svgDoc(pot, `<g filter="url(#o)">${PROPS[mood] || ''}${SHAPES[shape].replace(POT_SVG, '')}${potWithFace(mood)}</g>`);
   const svgPath = path.join(__dirname, 'svg', `${file}.svg`);
   fs.writeFileSync(svgPath, svg);
   const pngPath = path.join(__dirname, 'png', `${file}.png`);
-  execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars', '--default-background-color=00000000',
-    '--window-size=512,512', `--screenshot=${pngPath}`, `file://${svgPath}`], { stdio: 'ignore' });
+  shot(svgPath, pngPath);
   console.log(file, emoji);
 }
 fs.writeFileSync(path.join(__dirname, 'set.json'), JSON.stringify(SET.map(([file, shape, mood, pot, emoji, meaning]) => ({ file: `png/${file}.png`, shape, mood, emoji, meaning })), null, 2));
@@ -122,3 +128,4 @@ fs.writeFileSync(htmlPath, html);
 execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars', '--window-size=1200,962',
   `--screenshot=${path.join(__dirname, 'preview.png')}`, `file://${htmlPath}`], { stdio: 'ignore' });
 fs.unlinkSync(htmlPath);
+}

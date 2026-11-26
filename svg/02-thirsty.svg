@@ -13,8 +13,7 @@
   <feComponentTransfer result="d"><feFuncA type="linear" slope="25" intercept="-2.5"/></feComponentTransfer>
   <feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/>
   <feGaussianBlur in="d" stdDeviation=".9"/><feOffset dy=".7"/><feComponentTransfer><feFuncA type="linear" slope=".25"/></feComponentTransfer>
-  <feMerge><feMergeNode/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#o)"><path class="st" d="M32 44C30 34 24 26 18 21M32 44V16M32 44c2-10 8-18 14-23"/>
+  <feMerge><feMergeNode/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#o)"><path class="st" d="M32 44C30 34 24 26 18 21M32 44V16M32 44c2-10 8-18 14-23"/>
     <path class="lf2" transform="translate(17 17) rotate(-32) scale(1.15)" d="M0-12c7 6 8 16 6 21L0 5l-6 4c-2-5-1-15 6-21z"/>
     <path class="lf" transform="translate(32 11) scale(1.25)" d="M0-12c7 6 8 16 6 21L0 5l-6 4c-2-5-1-15 6-21z"/>
     <path class="lf2" transform="translate(47 17) rotate(32) scale(1.15)" d="M0-12c7 6 8 16 6 21L0 5l-6 4c-2-5-1-15 6-21z"/>
