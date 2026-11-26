@@ -60,6 +60,9 @@ const FACE_PROPS = { laugh: `${drop(22.6, 49.6, .5)}${drop(41.4, 49.6, .5)}` };
 const face = m => CHEEKS + (FACES[m] || NEW_FACES[m]) + (FACE_PROPS[m] || '');
 // Stickers are seen at ~160 px in a chat, so the pot grows from its rim and the face grows inside it.
 const POT_SCALE = 1.3, FACE_SCALE = 1.15;
+// Telegram stretches the 512 px canvas to its sticker size, so empty margin makes stickers look smaller.
+// 80 units fit the drawing edge to edge; 94 shows it at about 85%.
+const SIZE = 94, VIEW = `${32 - SIZE / 2} ${31 - SIZE / 2} ${SIZE} ${SIZE}`;
 const potWithFace = m => `<g transform="translate(32 40.5) scale(${POT_SCALE}) translate(-32 -40.5)">${POT_SVG}` +
   `<g transform="translate(32 52) scale(${FACE_SCALE}) translate(-32 -52)">${face(m)}</g></g>`;
 
@@ -90,7 +93,7 @@ fs.mkdirSync(path.join(__dirname, 'svg'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'png'), { recursive: true });
 for (const [file, shape, mood, pot, emoji] of SET) {
   const [p1, p2] = POTS[pot];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="-8 -9 80 80">
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="${VIEW}">
 <style>:root{--pot:${p1};--pot-2:${p2}}html,body,svg{margin:0;background:transparent}${CSS}</style>
 <defs>${FILTER}</defs>
 <g filter="url(#o)">${PROPS[mood] || ''}${SHAPES[shape].replace(POT_SVG, '')}${potWithFace(mood)}</g></svg>`;
