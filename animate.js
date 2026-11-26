@@ -9,7 +9,7 @@ const os = require('os');
 const path = require('path');
 const { execFile, execFileSync } = require('child_process');
 const { promisify } = require('util');
-const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
+const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
 
 // Telegram allows up to 3 s, 30 fps and 256 KB. Whole-sticker moves are translations, not rotations:
 // a rotated frame changes every pixel and the size limit then forces heavy compression.
@@ -44,13 +44,13 @@ const float = (svg, a, transform = '') => a < .002 ? '' :
   `<g opacity="${f(Math.min(1, a))}"><g filter="url(#o)"${transform ? ` transform="${transform}"` : ''}>${svg}</g></g>`;
 
 // One frame: plant (sway, sag) on a pot (squash from its base), with props behind/in front.
-// back: drawn inside the main outline; front: own outlines, moves with the sticker; over: own outlines, stays put.
-function scene({ shape, face, rot = 0, sag = 1, potSx = 1, potSy = 1, whole = '', back = '', front = '', over = '' }) {
+// back: drawn inside the main outline, behind the plant; fore: inside the main outline, in front of the pot; front: own outlines, moves with the sticker; over: own outlines, stays put.
+function scene({ shape, face, rot = 0, sag = 1, potSx = 1, potSy = 1, whole = '', back = '', fore = '', front = '', over = '' }) {
   const lift = -(potSy - 1) * POT_HEIGHT; // the rim moves with the squash, the plant rides on it
   const plant = `<g transform="translate(0 ${f(lift)}) rotate(${f(rot)} 32 44) translate(32 44) scale(1 ${f(sag)}) translate(-32 -44)">` +
     `${SHAPES[shape].replace(POT_SVG, '')}</g>`;
   const pot = `<g transform="translate(32 ${POT_BOTTOM}) scale(${f(potSx)} ${f(potSy)}) translate(-32 ${-POT_BOTTOM})">${potWith(face)}</g>`;
-  return `<g${whole ? ` transform="${whole}"` : ''}><g filter="url(#o)">${back}${plant}${pot}</g>${front}</g>${over}`;
+  return `<g${whole ? ` transform="${whole}"` : ''}><g filter="url(#o)">${back}${plant}${pot}${fore}</g>${front}</g>${over}`;
 }
 
 const SUN = '<circle fill="#ffc93c" cx="4" cy="6" r="4.2"/><path stroke="#ffc93c" stroke-width="1.6" stroke-linecap="round" d="M4-2.5v1.6M4 13v1.6M-4.5 6h1.6M11 6h1.6M-2 0l1.1 1.1M8.9 10.9 10 12M-2 12l1.1-1.1M8.9 1.1 10 0"/>';
@@ -175,20 +175,23 @@ const ANIMATIONS = {
     return scene({ shape: 'coleus', face, rot: 1.5 * sin(t), whole: `rotate(${f(5 * w)} ${BASE})`,
       back: w > .01 ? spark(58, 47, f(1.1 * w * tw)) + spark(60, 40, f(.6 * w * tw)) : '' });
   } },
-  // A thought bubble pops in piece by piece, eyes glance up at it, brow rises, mouth goes "hmm"
+  // Hand on chin: eyes glance aside, then up at a thought bubble that pops in; the hand taps the chin twice
   '13-thinking': { pot: 3, frame(t) {
-    const out = t < .86 ? 1 : 1 - smooth((t - .86) / .1); // everything goes away before the loop restarts
+    const out = t < .86 ? 1 : 1 - smooth((t - .86) / .1); // the bubble goes away before the loop restarts
     const pop = at => (t < at ? 0 : backOut(Math.min(1, (t - at) / .1))) * out;
-    const grow = (svg, k, cx, cy, extra = '') => k > .01 ? float(svg, 1, `translate(${cx} ${cy}) scale(${f(k)}) ${extra} translate(${-cx} ${-cy})`) : '';
-    const look = smooth((t - .16) / .1) * (1 - smooth((t - .84) / .1)); // 0 = ahead, 1 = up at the bubble
-    const ex = 27.8 + 1.2 * look, ey = 51 - .8 * look;
+    const grow = (svg, k, [cx, cy], extra = '') => k > .01 ? float(svg, 1, `translate(${cx} ${cy}) scale(${f(k)}) ${extra} translate(${-cx} ${-cy})`) : '';
+    // eyes: up-left first, then up-right at the bubble, back at the end
+    const side = -1 + 2 * (smooth((t - .3) / .1) - smooth((t - .86) / .1));
+    const ex = 28.2 + .9 * side, ey = 50.5, r = .35 * (side + 1);
     const eye = x => `<circle class="fe" cx="${f(x)}" cy="${f(ey)}" r="1.6"/><circle fill="#fff" cx="${f(x + .6)}" cy="${f(ey - .7)}" r=".55"/>`;
-    const face = CHEEKS + blink(eye(ex) + eye(ex + 8), t, .55) +
-      `<path class="fs" d="M34.8 ${f(48.4 - .6 * look)}q1.8 ${f(-.8 - .4 * look)} 3.6 0"/>` +
-      `<path class="fs" transform="translate(${f(.5 * sin(3 * t))} 0)" d="M30.2 55q1-.9 2 0t2 0"/>`;
-    const bubble = grow(THOUGHT.c1, pop(.06), 57.6, 13.6) + grow(THOUGHT.c2, pop(.14), 60, 9.4) +
-      grow(THOUGHT.bubble + THOUGHT.q, pop(.22), 64, 1, `rotate(${f(5 * sin(2 * t))})`);
-    return scene({ shape: 'upright', face, rot: 1.5 * sin(t), over: bubble });
+    const face = CHEEKS + blink(eye(ex) + eye(ex + 8), t, .62) +
+      `<path class="fs" d="M34.8 ${f(47.9 - .3 * r)}q1.8 ${f(-1.1 - r)} 3.6 0"/>` +
+      `<path class="fs" transform="translate(${f(.4 * sin(2 * t))} 0)" d="M29.4 55q1-.9 2 0t2 0"/>`;
+    const tap = -10 * (bump(t, .12, .05) + bump(t, .22, .05));
+    const { AT } = THOUGHT;
+    const bubble = grow(THOUGHT.c1, pop(.36), AT.c1) + grow(THOUGHT.c2, pop(.42), AT.c2) +
+      grow(THOUGHT.bubble + THOUGHT.q, pop(.48), AT.bubble, `rotate(${f(5 * sin(2 * t))})`);
+    return scene({ shape: 'upright', face, rot: 1.5 * sin(t), fore: thinkHand(f(tap)), over: bubble });
   } },
 };
 

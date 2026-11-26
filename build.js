@@ -31,13 +31,22 @@ const drop = (x, y, s = 1) => `<path class="drop" transform="translate(${x} ${y}
 const heart = (x, y, s = 1, c = '#e2457e') => `<path fill="${c}" transform="translate(${x} ${y}) scale(${s})" d="M0 2C-2.6.3-3.4-1.4-2.2-2.4c.9-.7 1.8-.3 2.2.4.4-.7 1.3-1.1 2.2-.4 1.2 1 .4 2.7-2.2 4.4z"/>`;
 const spark = (x, y, s = 1, c = '#ffc93c') => `<path fill="${c}" transform="translate(${x} ${y}) scale(${s})" d="M0-3.2Q.5-.5 3.2 0 .5.5 0 3.2-.5.5-3.2 0-.5-.5 0-3.2z"/>`;
 const zed = (x, y, s) => `<path class="ink" d="M${x} ${y}h${s}l-${s} ${s}h${s}"/>`;
-// Thought bubble: two small circles, a bubble and a "?" (animate.js pops them in one by one)
+// Thought bubble: two small circles, a bubble and a "?" (animate.js pops them in one by one around AT)
+const AT = { c1: [57.6, 13.6], c2: [60, 9.4], bubble: [64, 1] };
 const THOUGHT = {
-  c1: '<circle fill="#e3ddff" cx="57.6" cy="13.6" r="1.2"/>',
-  c2: '<circle fill="#e3ddff" cx="60" cy="9.4" r="1.7"/>',
-  bubble: '<ellipse fill="#e3ddff" cx="64" cy="1" rx="7.5" ry="6"/>',
-  q: '<path transform="translate(3 -2)" fill="none" stroke="#6b5bd6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M58.6 1.4q0-2.6 2.5-2.6t2.5 2.3q0 1.6-2.3 2.5v1.2"/><circle transform="translate(3 -2)" fill="#6b5bd6" cx="61.3" cy="7.2" r=".95"/>',
+  AT,
+  c1: `<circle fill="#e3ddff" cx="${AT.c1[0]}" cy="${AT.c1[1]}" r="1.2"/>`,
+  c2: `<circle fill="#e3ddff" cx="${AT.c2[0]}" cy="${AT.c2[1]}" r="1.7"/>`,
+  bubble: `<ellipse fill="#e3ddff" cx="${AT.bubble[0]}" cy="${AT.bubble[1]}" rx="7.5" ry="6"/>`,
+  q: `<g transform="translate(${AT.bubble[0] - 61} ${AT.bubble[1] - 3})"><path fill="none" stroke="#6b5bd6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M58.6 1.4q0-2.6 2.5-2.6t2.5 2.3q0 1.6-2.3 2.5v1.2"/><circle fill="#6b5bd6" cx="61.3" cy="7.2" r=".95"/></g>`,
 };
+// 🤔 hand: an arm from the pot's side (shoulder, elbow) with a leaf hand up at the chin.
+// Drawn in front of the pot, in sticker coordinates. tap tilts the hand (degrees).
+// An arm joined to the rim and hugging the pot reads as a mug handle; this one starts on the side.
+const HAND_BASE = '41 64.2';
+const thinkHand = (tap = 0) => '<path fill="none" stroke="#1f8a4c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M47.4 54.4Q55.6 57.6 53.8 63.4Q49 67.6 40.4 63.8"/>' +
+  `<g transform="rotate(${tap} ${HAND_BASE}) translate(${HAND_BASE}) scale(1.25) translate(${HAND_BASE.split(' ').map(n => -n).join(' ')})"><path class="lf" d="M41 64.2c-3.6-.2-5.8-2.8-5.4-6.6 3.4.6 5.6 3.2 5.4 6.6z"/></g>`;
+const FRONT = { thinking: thinkHand() };
 const PROPS = {
   hot: `<circle fill="#ffc93c" cx="4" cy="6" r="4.2"/><path stroke="#ffc93c" stroke-width="1.6" stroke-linecap="round" d="M4-2.5v1.6M4 13v1.6M-4.5 6h1.6M11 6h1.6M-2 0l1.1 1.1M8.9 10.9 10 12M-2 12l1.1-1.1M8.9 1.1 10 0"/>${drop(15, 37, .8)}${drop(50, 35, .9)}`,
   watered: `${drop(9, 13)}${drop(16, 5, .8)}${drop(4, 23, .7)}`,
@@ -63,7 +72,7 @@ const NEW_FACES = {
   grumpy: '<path class="fs" d="M25.8 47.4l3.4 1.5M38.2 47.4l-3.4 1.5M29.4 55.4q2.6-1.8 5.2 0"/><circle class="fe" cx="28" cy="50.8" r="1.5"/><circle class="fe" cx="36" cy="50.8" r="1.5"/>',
   wink: '<circle class="fe" cx="28" cy="50.2" r="1.5"/><path class="fs" d="M34.2 50.6q1.8-1.8 3.6 0M29 53.2q3 2.8 6 0"/>',
   // eyes with a shine glance up at the thought bubble, one brow raised, wavy "hmm" mouth (no low brows: they read angry)
-  thinking: '<circle class="fe" cx="29" cy="50.2" r="1.6"/><circle class="fe" cx="37" cy="50.2" r="1.6"/><circle fill="#fff" cx="29.6" cy="49.5" r=".55"/><circle fill="#fff" cx="37.6" cy="49.5" r=".55"/><path class="fs" d="M34.8 47.8q1.8-1.2 3.6 0M30.2 55q1-.9 2 0t2 0"/>',
+  thinking: '<circle class="fe" cx="29" cy="50.2" r="1.6"/><circle class="fe" cx="37" cy="50.2" r="1.6"/><circle fill="#fff" cx="29.6" cy="49.5" r=".55"/><circle fill="#fff" cx="37.6" cy="49.5" r=".55"/><path class="fs" d="M34.8 47.8q1.8-1.2 3.6 0M29.4 55q1-.9 2 0t2 0"/>',
 };
 // Props drawn inside the face, so they scale with it
 const FACE_PROPS = { laugh: `${drop(22.6, 49.6, .5)}${drop(41.4, 49.6, .5)}` };
@@ -110,14 +119,14 @@ const svgDoc = (pot, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="51
 const shot = (svgPath, pngPath) => execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars',
   '--default-background-color=00000000', '--window-size=512,512', `--screenshot=${pngPath}`, `file://${svgPath}`], { stdio: 'ignore' });
 
-module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
+module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
 if (require.main === module) main();
 
 function main() {
 fs.mkdirSync(path.join(__dirname, 'svg'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'png'), { recursive: true });
 for (const [file, shape, mood, pot, emoji] of SET) {
-  const svg = svgDoc(pot, `<g filter="url(#o)">${PROPS[mood] || ''}${SHAPES[shape].replace(POT_SVG, '')}${potWithFace(mood)}</g>`);
+  const svg = svgDoc(pot, `<g filter="url(#o)">${PROPS[mood] || ''}${SHAPES[shape].replace(POT_SVG, '')}${potWithFace(mood)}${FRONT[mood] || ''}</g>`);
   const svgPath = path.join(__dirname, 'svg', `${file}.svg`);
   fs.writeFileSync(svgPath, svg);
   const pngPath = path.join(__dirname, 'png', `${file}.png`);
