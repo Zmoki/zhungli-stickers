@@ -9,7 +9,7 @@ const os = require('os');
 const path = require('path');
 const { execFile, execFileSync } = require('child_process');
 const { promisify } = require('util');
-const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, droop, tears, TEAR_X, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
+const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, thinkHand, droop, tears, TEAR_X, can, canTip, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
 
 // Telegram allows up to 3 s, 30 fps and 256 KB. Whole-sticker moves are translations, not rotations:
 // a rotated frame changes every pixel and the size limit then forces heavy compression.
@@ -211,6 +211,24 @@ const ANIMATIONS = {
     })).join('');
     return scene({ shape: droop(1 - .3 * sob), face, potSx: 1 - .02 * sob, potSy: 1 + .035 * sob,
       whole: `translate(0 ${f(-1.2 * sob)})`, front: drips });
+  } },
+  // 💧 Time to water: the can tips and pours, the plant perks up and beams, then the can rights itself
+  '15-water': { pot: 2, frame(t) {
+    const pour = tt => Math.max(0, smooth((tt - .08) / .14) - smooth((tt - .72) / .14));
+    const P = pour(t), theta = -5 - 33 * P;
+    // 3 drops in the air at a time, 6 per loop; each starts at the spout where it was when the drop left
+    const drops = [0, 1, 2].map(i => {
+      const p = (6 * t + i / 3) % 1, te = (t - p / 6 + 1) % 1, g = smooth((pour(te) - .6) / .3);
+      const [x, y] = canTip(-5 - 33 * pour(te));
+      return float(drop(f(x - 1.4 * p), f(y + 2 + 11 * p), .55), fade(p, .1, .25) * g);
+    }).join('');
+    const perk = pour((t - .1 + 1) % 1); // leaves lift a moment after the water lands
+    const face = CHEEKS + blink('<circle class="fe" cx="29.4" cy="49.8" r="1.6"/><circle class="fe" cx="37.4" cy="49.8" r="1.6"/><circle fill="#fff" cx="30" cy="49.1" r=".55"/><circle fill="#fff" cx="38" cy="49.1" r=".55"/>', t, .9) +
+      `<g transform="translate(32 53) scale(1 ${f(.75 + .35 * P)}) translate(-32 -53)"><path class="fe" d="M29.2 53h5.6q-.3 3.2-2.8 3.2t-2.8-3.2z"/>` +
+      '<path fill="#ff6f9f" d="M30.6 55.4q1.4-1 2.8 0-.5.8-1.4.8t-1.4-.8z"/></g>';
+    return scene({ shape: 'split', face, rot: 1.5 * sin(t), sag: 1 + .06 * perk,
+      potSx: 1 + .015 * perk * sin(4 * t), potSy: 1 - .015 * perk * sin(4 * t),
+      over: float(can(f(theta)), 1, `translate(0 ${f(.6 * sin(2 * t))})`) + drops });
   } },
 };
 

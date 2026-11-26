@@ -16,6 +16,8 @@ Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.
 - `build.js`: builds everything above and `preview.png`
 - `webm/`: animated video stickers, 512×512, 24 fps, 2.9 s loop, same names and emoji as `png/`
 - `animate.js`: builds `webm/` and `animated-preview.gif`
+- `icon/`: pack icon from the app icon, 100×100 (`icon.png` for a static pack, animated `icon.webm` for a video pack)
+- `icon.js`: builds `icon/`
 
 ## Build
 
@@ -29,7 +31,7 @@ Projects/
 
 Then run `node build.js` for the stickers and `node animate.js` for the animated ones. They need Node, Google Chrome (macOS path) and ffmpeg with VP9.
 
-In @Stickers, upload `png/` with `/newpack` and `webm/` with `/newvideo`.
+In @Stickers, upload `png/` with `/newpack` and `webm/` with `/newvideo`, and set the icon with `/setpackicon`.
 
 To add or change a sticker with Claude Code, ask for it in this repo: the `add-sticker` skill (`.claude/skills/add-sticker/`) has the style rules and steps.
 

@@ -96,5 +96,12 @@
     "mood": "crying",
     "emoji": "😭",
     "meaning": "crying"
+  },
+  {
+    "file": "png/15-water.png",
+    "shape": "split",
+    "mood": "water",
+    "emoji": "💧",
+    "meaning": "time to water"
   }
 ]
