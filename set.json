@@ -82,5 +82,12 @@
     "mood": "wink",
     "emoji": "😉",
     "meaning": "wink"
+  },
+  {
+    "file": "png/13-thinking.png",
+    "shape": "upright",
+    "mood": "thinking",
+    "emoji": "🤔",
+    "meaning": "thinking"
   }
 ]

@@ -31,6 +31,13 @@ const drop = (x, y, s = 1) => `<path class="drop" transform="translate(${x} ${y}
 const heart = (x, y, s = 1, c = '#e2457e') => `<path fill="${c}" transform="translate(${x} ${y}) scale(${s})" d="M0 2C-2.6.3-3.4-1.4-2.2-2.4c.9-.7 1.8-.3 2.2.4.4-.7 1.3-1.1 2.2-.4 1.2 1 .4 2.7-2.2 4.4z"/>`;
 const spark = (x, y, s = 1, c = '#ffc93c') => `<path fill="${c}" transform="translate(${x} ${y}) scale(${s})" d="M0-3.2Q.5-.5 3.2 0 .5.5 0 3.2-.5.5-3.2 0-.5-.5 0-3.2z"/>`;
 const zed = (x, y, s) => `<path class="ink" d="M${x} ${y}h${s}l-${s} ${s}h${s}"/>`;
+// Thought bubble: two small circles, a bubble and a "?" (animate.js pops them in one by one)
+const THOUGHT = {
+  c1: '<circle fill="#e3ddff" cx="57.6" cy="13.6" r="1.2"/>',
+  c2: '<circle fill="#e3ddff" cx="60" cy="9.4" r="1.7"/>',
+  bubble: '<ellipse fill="#e3ddff" cx="64" cy="1" rx="7.5" ry="6"/>',
+  q: '<path transform="translate(3 -2)" fill="none" stroke="#6b5bd6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M58.6 1.4q0-2.6 2.5-2.6t2.5 2.3q0 1.6-2.3 2.5v1.2"/><circle transform="translate(3 -2)" fill="#6b5bd6" cx="61.3" cy="7.2" r=".95"/>',
+};
 const PROPS = {
   hot: `<circle fill="#ffc93c" cx="4" cy="6" r="4.2"/><path stroke="#ffc93c" stroke-width="1.6" stroke-linecap="round" d="M4-2.5v1.6M4 13v1.6M-4.5 6h1.6M11 6h1.6M-2 0l1.1 1.1M8.9 10.9 10 12M-2 12l1.1-1.1M8.9 1.1 10 0"/>${drop(15, 37, .8)}${drop(50, 35, .9)}`,
   watered: `${drop(9, 13)}${drop(16, 5, .8)}${drop(4, 23, .7)}`,
@@ -43,6 +50,7 @@ const PROPS = {
   grumpy: `<path fill="none" stroke="#e2457e" stroke-width="1.8" stroke-linecap="round" d="M53 4.6q2.4 0 2.4-2.4M58.6 2.2q0 2.4 2.4 2.4M61 8.2q-2.4 0-2.4 2.4M55.4 10.6q0-2.4-2.4-2.4"/>`,
   wink: `${spark(58, 47, 1.1)}${spark(60, 40, .6)}`,
   fine: `${spark(8, 12, .9)}${spark(57, 36, .7)}`,
+  thinking: THOUGHT.c1 + THOUGHT.c2 + THOUGHT.bubble + THOUGHT.q,
 };
 
 // New faces (same grid as FACES in shapes.js: eyes at y≈50, mouth at y≈54)
@@ -54,6 +62,8 @@ const NEW_FACES = {
   party: '<path class="fs" d="M26.2 51l1.8-1.9 1.8 1.9M34.2 51l1.8-1.9 1.8 1.9"/><path class="fe" d="M28.8 52.8h6.4q-.3 3.4-3.2 3.4t-3.2-3.4z"/><path fill="#ff6f9f" d="M30.6 55.4q1.4-1.2 2.8 0-.5.8-1.4.8t-1.4-.8z"/>',
   grumpy: '<path class="fs" d="M25.8 47.4l3.4 1.5M38.2 47.4l-3.4 1.5M29.4 55.4q2.6-1.8 5.2 0"/><circle class="fe" cx="28" cy="50.8" r="1.5"/><circle class="fe" cx="36" cy="50.8" r="1.5"/>',
   wink: '<circle class="fe" cx="28" cy="50.2" r="1.5"/><path class="fs" d="M34.2 50.6q1.8-1.8 3.6 0M29 53.2q3 2.8 6 0"/>',
+  // eyes glance up at the thought bubble, right brow raised, "hmm" mouth
+  thinking: '<circle class="fe" cx="28.6" cy="51" r="1.5"/><circle class="fe" cx="36.6" cy="51" r="1.5"/><path class="fs" d="M26.6 48.6l3 .1M34.4 48.2q1.8-1.4 3.6-.2M30 55.4l4.2-.7"/>',
 };
 // Props drawn inside the face, so they scale with it
 const FACE_PROPS = { laugh: `${drop(22.6, 49.6, .5)}${drop(41.4, 49.6, .5)}` };
@@ -81,6 +91,7 @@ const SET = [
   ['10-party', 'flowering', 'party', 0, '🥳', 'party'],
   ['11-grumpy', 'prayer', 'grumpy', 4, '😤', 'grumpy'],
   ['12-wink', 'coleus', 'wink', 5, '😉', 'wink'],
+  ['13-thinking', 'upright', 'thinking', 3, '🤔', 'thinking'],
 ];
 
 // Thin white sticker outline with a soft shadow. Blur + threshold gives a round edge
@@ -99,7 +110,7 @@ const svgDoc = (pot, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="51
 const shot = (svgPath, pngPath) => execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars',
   '--default-background-color=00000000', '--window-size=512,512', `--screenshot=${pngPath}`, `file://${svgPath}`], { stdio: 'ignore' });
 
-module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
+module.exports = { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, CHEEKS, CHROME, SET, POT_SCALE, drop, heart, spark, zed, potWith, svgDoc, shot };
 if (require.main === module) main();
 
 function main() {
@@ -125,7 +136,8 @@ figure{margin:0;text-align:center}img{width:100%;display:block}figcaption{margin
 </style><section class="light">${cells}</section><section class="dark">${cells}</section>`;
 const htmlPath = path.join(__dirname, 'preview.html');
 fs.writeFileSync(htmlPath, html);
-execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars', '--window-size=1200,962',
+const rows = Math.ceil(SET.length / 6); // each section: padding, rows of ~213 px, gaps
+execFileSync(CHROME, ['--headless', '--disable-gpu', '--hide-scrollbars', `--window-size=1200,${2 * (48 + rows * 213 + (rows - 1) * 8)}`,
   `--screenshot=${path.join(__dirname, 'preview.png')}`, `file://${htmlPath}`], { stdio: 'ignore' });
 fs.unlinkSync(htmlPath);
 }

@@ -4,9 +4,9 @@ Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.
 
 **Add the pack:** [t.me/addstickers/wearejungly](https://t.me/addstickers/wearejungly)
 
-![12 stickers on light and dark chat backgrounds](preview.png)
+![All stickers on light and dark chat backgrounds](preview.png)
 
-![12 animated stickers](animated-preview.gif)
+![All animated stickers](animated-preview.gif)
 
 ## Files
 

@@ -9,7 +9,7 @@ const os = require('os');
 const path = require('path');
 const { execFile, execFileSync } = require('child_process');
 const { promisify } = require('util');
-const { SHAPES, POT_SVG, FACES, NEW_FACES, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
+const { SHAPES, POT_SVG, FACES, NEW_FACES, THOUGHT, CHEEKS, POT_SCALE, CHROME, drop, heart, spark, zed, potWith, svgDoc } = require('./build.js');
 
 // Telegram allows up to 3 s, 30 fps and 256 KB. Whole-sticker moves are translations, not rotations:
 // a rotated frame changes every pixel and the size limit then forces heavy compression.
@@ -174,6 +174,20 @@ const ANIMATIONS = {
     const tw = 1 + .15 * sin(4 * t);
     return scene({ shape: 'coleus', face, rot: 1.5 * sin(t), whole: `rotate(${f(5 * w)} ${BASE})`,
       back: w > .01 ? spark(58, 47, f(1.1 * w * tw)) + spark(60, 40, f(.6 * w * tw)) : '' });
+  } },
+  // A thought bubble pops in piece by piece, eyes glance up at it, brow rises, mouth goes "hmm"
+  '13-thinking': { pot: 3, frame(t) {
+    const out = t < .86 ? 1 : 1 - smooth((t - .86) / .1); // everything goes away before the loop restarts
+    const pop = at => (t < at ? 0 : backOut(Math.min(1, (t - at) / .1))) * out;
+    const grow = (svg, k, cx, cy, extra = '') => k > .01 ? float(svg, 1, `translate(${cx} ${cy}) scale(${f(k)}) ${extra} translate(${-cx} ${-cy})`) : '';
+    const look = smooth((t - .16) / .1) * (1 - smooth((t - .84) / .1)); // 0 = ahead, 1 = up at the bubble
+    const ex = 27.6 + 1 * look, ey = 51.4 - .5 * look, r = .7 * look;
+    const face = CHEEKS + blink(`<circle class="fe" cx="${f(ex)}" cy="${f(ey)}" r="1.5"/><circle class="fe" cx="${f(ex + 8)}" cy="${f(ey)}" r="1.5"/>`, t, .55) +
+      `<path class="fs" d="M26.6 48.6l3 .1M34.4 ${f(48.4 - .2 * look)}q1.8 ${f(-1 - r)} 3.6 -.2"/>` +
+      `<path class="fs" transform="translate(${f(.5 * sin(3 * t))} 0)" d="M30 55.4l4.2-.7"/>`;
+    const bubble = grow(THOUGHT.c1, pop(.06), 57.6, 13.6) + grow(THOUGHT.c2, pop(.14), 60, 9.4) +
+      grow(THOUGHT.bubble + THOUGHT.q, pop(.22), 64, 1, `rotate(${f(5 * sin(2 * t))})`);
+    return scene({ shape: 'upright', face, rot: 1.5 * sin(t), over: bubble });
   } },
 };
 
