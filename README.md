@@ -16,7 +16,7 @@ Telegram stickers with the plants from the [Жунгли](https://zhungli.zmoki.
 - `build.js`: builds everything above and `preview.png`
 - `webm/`: animated video stickers, 512×512, 24 fps, 2.9 s loop, same names and emoji as `png/`
 - `animate.js`: builds `webm/` and `animated-preview.gif`
-- `icon/`: pack icon from the app icon, 100×100 (`icon.png` for a static pack, animated `icon.webm` for a video pack)
+- `icon/`: pack icon, 100×100 PNG with a clear background: the monstera from 💧 (not the app icon, which the Telegram mini app uses)
 - `icon.js`: builds `icon/`
 
 ## Build
