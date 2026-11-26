@@ -188,7 +188,7 @@ const ANIMATIONS = {
     const eye = x => `<circle class="fe" cx="${f(x)}" cy="${f(ey)}" r="1.6"/><circle fill="#fff" cx="${f(x + .6)}" cy="${f(ey - .7)}" r=".55"/>`;
     const face = CHEEKS + blink(eye(ex) + eye(ex + 8), t, .62) +
       `<path class="fs" d="M34.8 ${f(47.9 - .3 * r)}q1.8 ${f(-1.1 - r)} 3.6 0"/>` +
-      `<path class="fs" transform="translate(${f(.4 * sin(2 * t))} 0)" d="M29.4 55q1-.9 2 0t2 0"/>`;
+      `<path class="fs" transform="translate(${f(.35 * sin(2 * t))} 0)" d="M30.8 54.2q-1.1.9 0 1.8"/>`;
     const { AT } = THOUGHT;
     const bubble = grow(THOUGHT.c1, pop(.4), AT.c1) + grow(THOUGHT.c2, pop(.46), AT.c2) +
       grow(THOUGHT.bubble + THOUGHT.q, pop(.52), AT.bubble, `rotate(${f(5 * sin(2 * t))})`);
