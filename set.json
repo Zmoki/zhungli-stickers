@@ -1,0 +1,86 @@
+[
+  {
+    "file": "png/01-ok.png",
+    "shape": "split",
+    "mood": "fine",
+    "emoji": "👍",
+    "meaning": "all good"
+  },
+  {
+    "file": "png/02-thirsty.png",
+    "shape": "arrow",
+    "mood": "need",
+    "emoji": "😩",
+    "meaning": "so tired"
+  },
+  {
+    "file": "png/03-bliss.png",
+    "shape": "orchid",
+    "mood": "watered",
+    "emoji": "😌",
+    "meaning": "bliss / thanks"
+  },
+  {
+    "file": "png/04-sad.png",
+    "shape": "tree",
+    "mood": "dim",
+    "emoji": "😔",
+    "meaning": "sad"
+  },
+  {
+    "file": "png/05-hot.png",
+    "shape": "cactus",
+    "mood": "hot",
+    "emoji": "🥵",
+    "meaning": "so hot"
+  },
+  {
+    "file": "png/06-love.png",
+    "shape": "heart",
+    "mood": "love",
+    "emoji": "😍",
+    "meaning": "love it"
+  },
+  {
+    "file": "png/07-laugh.png",
+    "shape": "flytrap",
+    "mood": "laugh",
+    "emoji": "😂",
+    "meaning": "lol"
+  },
+  {
+    "file": "png/08-sleepy.png",
+    "shape": "palm",
+    "mood": "sleepy",
+    "emoji": "😴",
+    "meaning": "sleepy"
+  },
+  {
+    "file": "png/09-wow.png",
+    "shape": "succulent",
+    "mood": "wow",
+    "emoji": "😮",
+    "meaning": "wow"
+  },
+  {
+    "file": "png/10-party.png",
+    "shape": "flowering",
+    "mood": "party",
+    "emoji": "🥳",
+    "meaning": "party"
+  },
+  {
+    "file": "png/11-grumpy.png",
+    "shape": "prayer",
+    "mood": "grumpy",
+    "emoji": "😤",
+    "meaning": "grumpy"
+  },
+  {
+    "file": "png/12-wink.png",
+    "shape": "coleus",
+    "mood": "wink",
+    "emoji": "😉",
+    "meaning": "wink"
+  }
+]
