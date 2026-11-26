@@ -31,6 +31,8 @@ Then run `node build.js` for the stickers and `node animate.js` for the animated
 
 In @Stickers, upload `png/` with `/newpack` and `webm/` with `/newvideo`.
 
+To add or change a sticker with Claude Code, ask for it in this repo: the `add-sticker` skill (`.claude/skills/add-sticker/`) has the style rules and steps.
+
 ## License
 
 All rights reserved. You can send the stickers from the [official pack](https://t.me/addstickers/wearejungly) in Telegram. See [LICENSE](LICENSE).

@@ -2,6 +2,8 @@
 // Builds animated Telegram video stickers: webm/*.webm (512x512 VP9 with alpha, under 3 s, 24 fps, looping).
 // Each frame is an SVG drawn from the same parts as build.js, rendered by headless Chrome, then joined by ffmpeg.
 // Run `node animate.js` for all, or `node animate.js 08-sleepy` for one.
+// `node animate.js 08-sleepy --stills` shows 4 moments of the loop before rendering (stills.png);
+// `node animate.js 08-sleepy --check` shows every 10th frame of the finished file (check.png).
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -175,11 +177,10 @@ const ANIMATIONS = {
   } },
 };
 
-async function render(name, { pot, frame }) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `sticker-${name}-`));
+// Renders the given frame numbers to PNGs in dir, several Chrome processes at once
+async function renderFrames({ pot, frame }, frames, dir) {
   const run = promisify(execFile);
-  const jobs = Array.from({ length: FRAMES }, (_, i) => i);
-  // Several Chrome processes at once, each with its own profile folder
+  const jobs = [...frames];
   const worker = async k => {
     for (let i; (i = jobs.shift()) !== undefined;) {
       const n = String(i).padStart(3, '0');
@@ -195,6 +196,11 @@ async function render(name, { pot, frame }) {
     }
   };
   await Promise.all(Array.from({ length: 6 }, (_, k) => worker(k)));
+}
+
+async function render(name, anim) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `sticker-${name}-`));
+  await renderFrames(anim, Array.from({ length: FRAMES }, (_, i) => i), dir);
   fs.mkdirSync(path.join(__dirname, 'webm'), { recursive: true });
   const out = path.join(__dirname, 'webm', `${name}.webm`);
   let crf = CRF;
@@ -206,6 +212,34 @@ async function render(name, { pot, frame }) {
   }
   if (process.env.KEEP_FRAMES) console.log('frames kept in', dir); else fs.rmSync(dir, { recursive: true });
   console.log(name, `${(fs.statSync(out).size / 1024).toFixed(0)} KB`, `CRF ${crf}`);
+}
+
+// Puts PNGs in rows on a Telegram-like chat background
+const sheet = (pngs, size, perRow, out) => {
+  const rows = [];
+  for (let i = 0; i < pngs.length; i += perRow) rows.push(['(', ...pngs.slice(i, i + perRow), '-resize', `${size}x${size}`, '+append', ')']);
+  execFileSync('magick', [...rows.flat(), '-background', 'none', '-append', '+repage', '-background', '#c8dba8', '-alpha', 'remove', out]);
+};
+
+// --stills: 4 moments of the loop before a full render (a few seconds instead of a minute)
+async function stills(name, anim) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `sticker-${name}-`));
+  const frames = [0, .25, .5, .75].map(t => Math.round(t * FRAMES));
+  await renderFrames(anim, frames, dir);
+  sheet(frames.map(i => path.join(dir, `${String(i).padStart(3, '0')}.png`)), 256, 4, path.join(__dirname, 'stills.png'));
+  fs.rmSync(dir, { recursive: true });
+  console.log('stills.png');
+}
+
+// --check: every 10th frame of the finished WEBM at near full size, to spot compression smudges
+function check(name) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `sticker-${name}-`));
+  // -c:v libvpx-vp9 before -i keeps the alpha channel
+  execFileSync('ffmpeg', ['-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', path.join(__dirname, 'webm', `${name}.webm`),
+    '-vf', 'select=not(mod(n\\,10))', '-fps_mode', 'passthrough', path.join(dir, '%02d.png')]);
+  sheet(fs.readdirSync(dir).sort().map(n => path.join(dir, n)), 400, 4, path.join(__dirname, 'check.png'));
+  fs.rmSync(dir, { recursive: true });
+  console.log('check.png');
 }
 
 // GIF preview of all animations, 6 per row, on a Telegram-like chat background
@@ -225,7 +259,10 @@ function preview() {
 
 module.exports = { ANIMATIONS };
 if (require.main === module) (async () => {
-  const only = process.argv[2];
+  const [only, mode] = process.argv.slice(2);
+  if (only && !ANIMATIONS[only]) throw new Error(`No animation named ${only}`);
+  if (mode === '--stills') return stills(only, ANIMATIONS[only]);
+  if (mode === '--check') return check(only);
   for (const [name, anim] of Object.entries(ANIMATIONS)) if (!only || name === only) await render(name, anim);
   preview();
 })();
